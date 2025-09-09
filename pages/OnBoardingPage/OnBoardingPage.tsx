@@ -251,7 +251,7 @@ function CustomRenderItem({item, index, scroll}: {
                     <View
                         className={"h-screen w-screen absolute top-0 left-0 justify-end items-end p-[2rem]"}>
                         <Pressable onPress={() => {
-                            nextButtonClickedScale.value = withTiming(21, {
+                            nextButtonClickedScale.value = withTiming(22, {
                                 duration: 750,
                                 easing: Easing.bezier(0.85, 0, 0.15, 1)
                             });
