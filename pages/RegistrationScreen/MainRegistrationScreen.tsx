@@ -71,7 +71,7 @@ export default function MainRegistrationScreen(): React.JSX.Element {
 
     const contentViewHeadingTopMargin: SharedValue<number> = useSharedValue(0);
     const contentViewTopPosition: SharedValue<number> = useSharedValue(height * 0.43);
-    const forgotPasswordViewLeftPosition: SharedValue<number> = useSharedValue(SCREEN_WIDTH);
+    const forgotPasswordViewLeftPosition: SharedValue<number> = useSharedValue(SCREEN_WIDTH + 100);
 
     const contentViewHeadingTopMarginAnimation = useAnimatedStyle(() => {
         return {
@@ -128,7 +128,7 @@ export default function MainRegistrationScreen(): React.JSX.Element {
 
             <Animated.View
                 style={forgotPasswordViewLeftPositionAnimation}
-                className={"h-screen w-screen bg-blue-300 absolute z-[12]"}>
+                className={"h-screen w-screen absolute z-[12]"}>
                 <ForgetPasswordScreen forgotPasswordViewLeftPosition={forgotPasswordViewLeftPosition}/>
             </Animated.View>
 
@@ -226,7 +226,7 @@ export default function MainRegistrationScreen(): React.JSX.Element {
                 <Pressable
                     onPress={() => {
                         forgotPasswordViewLeftPosition.value = withTiming(0, {
-                            duration: 500,
+                            duration: 350,
                             easing: Easing.bezier(0.55, 0, 0.15, 1)
                         });
                     }}
