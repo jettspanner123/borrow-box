@@ -24,12 +24,14 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import CustomTextField from "../../components/shared/CustomTextField";
 import * as Haptics from "expo-haptics";
-import ForgetPasswordScreen from "./ForgetPasswordScreen";
+import {useNavigation} from "@react-navigation/native";
+import {SCREENS} from "../../App";
 
 
 const {width: SCREEN_WIDTH} = Dimensions.get("window");
 export default function MainRegistrationScreen(): React.JSX.Element {
 
+    const navigation = useNavigation();
 
     const {height} = useWindowDimensions();
 
@@ -71,7 +73,7 @@ export default function MainRegistrationScreen(): React.JSX.Element {
 
     const contentViewHeadingTopMargin: SharedValue<number> = useSharedValue(0);
     const contentViewTopPosition: SharedValue<number> = useSharedValue(height * 0.43);
-    const forgotPasswordViewLeftPosition: SharedValue<number> = useSharedValue(SCREEN_WIDTH + 100);
+
 
     const contentViewHeadingTopMarginAnimation = useAnimatedStyle(() => {
         return {
@@ -85,11 +87,6 @@ export default function MainRegistrationScreen(): React.JSX.Element {
         }
     });
 
-    const forgotPasswordViewLeftPositionAnimation = useAnimatedStyle(() => {
-        return {
-            left: forgotPasswordViewLeftPosition.value,
-        }
-    });
 
     React.useEffect((): () => void => {
         const showEvent = Keyboard.addListener("keyboardDidShow", () => {
@@ -113,9 +110,21 @@ export default function MainRegistrationScreen(): React.JSX.Element {
             })
         })
 
+        const androidHideEvent = Keyboard.addListener("keyboardDidHide", (): void => {
+            contentViewHeadingTopMargin.value = withTiming(0, {
+                duration: 250,
+                easing: Easing.linear
+            })
+            contentViewTopPosition.value = withTiming(height * 0.43, {
+                duration: 500,
+                easing: Easing.bezier(0.85, 0, 0.15, 1)
+            })
+        })
+
         return (): void => {
             showEvent.remove();
             hideEvent.remove();
+            androidHideEvent.remove();
         }
     }, []);
 
@@ -125,12 +134,6 @@ export default function MainRegistrationScreen(): React.JSX.Element {
             entering={CustomBackgroundColorAnimation}
             className={"w-screen h-screen items-center justify-start"}>
 
-
-            <Animated.View
-                style={forgotPasswordViewLeftPositionAnimation}
-                className={"h-screen w-screen absolute z-[12]"}>
-                <ForgetPasswordScreen forgotPasswordViewLeftPosition={forgotPasswordViewLeftPosition}/>
-            </Animated.View>
 
             {/*MARK: This is the page change transition blob*/}
             <View className={"bg-red-300 w-screen justify-between items-center absolute -translate-y-[10rem] z-[11]"}>
@@ -179,12 +182,11 @@ export default function MainRegistrationScreen(): React.JSX.Element {
 
                 <Animated.Text
                     style={contentViewHeadingTopMarginAnimation}
-                    className={`font-bold text-[2rem] transition-all duration-500`}>
+                    className={`font-bold text-[2rem]`}>
                     Sign In
+
                 </Animated.Text>
 
-                <View
-                    className={"h-[1px] bg-black/50 w-full my-[0.5rem] mt-[1rem]"}/>
 
                 <CustomTextField
                     onChange={(e: string): void => setSignInFormData(({emailId: e, password: signInFormData.password}))}
@@ -193,7 +195,9 @@ export default function MainRegistrationScreen(): React.JSX.Element {
                     placeholder={"Email Id"}
                     icon={
                         <MaterialIcons name="email" size={20} color="rgba(0, 0, 0, 0.2)"/>
-                    }/>
+                    }
+                    keyboardType={"email-address"}
+                />
 
                 <CustomTextField
                     onChange={(e: string): void => setSignInFormData(({emailId: signInFormData.emailId, password: e}))}
@@ -203,6 +207,7 @@ export default function MainRegistrationScreen(): React.JSX.Element {
                     icon={
                         <FontAwesome5 name="key" size={20} color="rgba(0, 0, 0, 0.2)"/>
                     }
+                    keyboardType={"default"}
                 />
 
                 <Pressable
@@ -225,10 +230,8 @@ export default function MainRegistrationScreen(): React.JSX.Element {
 
                 <Pressable
                     onPress={() => {
-                        forgotPasswordViewLeftPosition.value = withTiming(0, {
-                            duration: 350,
-                            easing: Easing.bezier(0.55, 0, 0.15, 1)
-                        });
+                        // @ts-ignore
+                        navigation.navigate(SCREENS.ForgotPasswordScreen)
                     }}
                     className={"w-full h-[3rem]"}>
                     <View
