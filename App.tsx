@@ -25,6 +25,7 @@ function HomeScreen( ): React.JSX.Element {
 
             <MainRegistrationScreen/>
             {/*<MainSignUpScreen />*/}
+            {/*<BasicInformationScreen />*/}
         </View>
     )
 }

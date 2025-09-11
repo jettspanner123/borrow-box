@@ -84,3 +84,5 @@ export default function CustomTextField(
         </View>
     )
 }
+export const CustomTextFieldWrapperStyles: string = "bg-white h-[3.5rem] flex-row items-center border-[0.5px] border-black/30 rounded-2xl mt-[1rem] gap-[0.75rem]";
+export const CustomTextFieldTextInputStyles: string = "text-[1rem] flex-1";

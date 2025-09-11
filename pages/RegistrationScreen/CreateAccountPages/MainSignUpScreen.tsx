@@ -15,10 +15,12 @@ import Animated, {
 import {z} from "zod";
 import {useNavigation} from "@react-navigation/native";
 import {SCREENS} from "../../../App";
+import {useNewUserSignUpStore} from "../../../store/NewUserSignUpStore";
 
 const {width: SCREEN_WIDTH} = Dimensions.get("window");
 
 export default function MainSignUpScreen(): React.JSX.Element {
+
 
     const navigation = useNavigation();
 
@@ -51,7 +53,6 @@ export default function MainSignUpScreen(): React.JSX.Element {
     async function submitForm(): Promise<void> {
         const emailSchema: z.ZodEmail = z.email();
         const res: z.ZodSafeParseResult<string> = emailSchema.safeParse(email);
-
 
 
         if (res.success) {
@@ -160,7 +161,6 @@ export default function MainSignUpScreen(): React.JSX.Element {
                 </Animated.View>
 
 
-
                 {/*MARK: Proceed furterh button*/}
                 {
                     email.length > 0 && (
@@ -175,7 +175,7 @@ export default function MainSignUpScreen(): React.JSX.Element {
                                         <ActivityIndicator size={"small"} color={"white"}/>
                                     ) : (
                                         <Text className={"font-bold text-white"}>
-                                            {loading ? "true" : "false"}
+                                            Proceed Further
                                         </Text>
                                     )
                                 }
@@ -183,8 +183,6 @@ export default function MainSignUpScreen(): React.JSX.Element {
                         </Pressable>
                     )
                 }
-
-
 
 
                 {/*MARK: THis is the divider*/}

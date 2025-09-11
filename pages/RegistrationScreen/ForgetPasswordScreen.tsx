@@ -17,11 +17,10 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withTiming,
-    SlideOutLeft,
-    SlideOutRight,
-    SlideInRight, SlideInLeft, LinearTransition
+    LinearTransition
 } from "react-native-reanimated";
-import * as querystring from "node:querystring";
+import SectionBreak from "../../components/shared/Sectionbreak";
+import {Entypo} from "@expo/vector-icons";
 
 
 export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
@@ -30,7 +29,8 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
 
     enum PhoneVerificationScreens {
         PhoneNumberFormScreen,
-        PhoneNumberVerificationScreen
+        PhoneNumberVerificationScreen,
+        ResetPasswordScreen
     }
 
     const otpFieldRefOne: React.RefObject<TextInput | null> = React.useRef(null);
@@ -91,6 +91,16 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
     }
 
+    async function checkOTP(): Promise<void> {
+        setOTPLoading(true);
+        setTimeout(() => {
+            setOTPLoading(false);
+            setCurrentScreen(PhoneVerificationScreens.ResetPasswordScreen);
+        }, 3000);
+        Keyboard.dismiss();
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+
     const handleChange = (text: string, index: number) => {
         // Update the digit in the right spot
         const newOTP = [...OTP];
@@ -102,6 +112,18 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
         if (text && index === 1) otpFieldRefThree.current?.focus();
         if (text && index === 2) otpFieldRefFour.current?.focus();
     };
+
+    interface ResetPasswordVariables {
+        passwordRules: Array<string>
+    }
+
+    const ResetPasswordVariables: ResetPasswordVariables = {
+        passwordRules: [
+            "The Password Should Be 8 Characters Long.",
+            "Password Should Have At Least 1 Special Character. [@, #, !, $, %, ^, &, *]",
+            "The Password Should Not Contain Any Slur Words!"
+        ]
+    }
 
     return (
         <Animated.View
@@ -148,7 +170,7 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
                             </View>
                         </Pressable>
                     </Animated.View>
-                ) : (
+                ) : currentScreen === PhoneVerificationScreens.PhoneNumberVerificationScreen ? (
                     <Animated.View
                         className={"w-full px-[1.5rem] pt-[13vh]"}>
                         <Text className={"font-semibold text-[2.6rem]"}>Confirm Your Mobile Number ☎️</Text>
@@ -169,6 +191,7 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
 
                                     return (
                                         <TextInput
+                                            key={index}
                                             ref={getRef()}
                                             autoFocus={index === 0}
                                             value={OTP[index]}
@@ -213,11 +236,78 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
                             style={bottomPaddingForKeyboardAnimation}
                             pointerEvents={"box-none"}
                             className={"absolute  h-screen w-screen justify-end items-center px-[1.5rem]"}>
-                            <Pressable className={"w-full justify-center items-center bg-black rounded-xl h-[3.5rem]"}>
-                                <Text className={"text-white font-bold"}>Confirm</Text>
+                            <Pressable
+                                onPress={checkOTP}
+                                className={"w-full justify-center items-center bg-black rounded-xl h-[3.5rem]"}>
+                                {
+                                    isOTPLoading ? (
+                                        <ActivityIndicator size={"small"} color={"white"}/>
+                                    ) : (
+                                        <Text className={"text-white font-bold"}>Confirm</Text>
+                                    )
+                                }
                             </Pressable>
 
                         </Animated.View>
+                    </Animated.View>
+                ) : (
+                    <Animated.View
+                        className={"w-full px-[1.5rem] pt-[13vh]"}>
+                        <Text className={"font-semibold text-[2.6rem]"}>Set Up Your New Password 🔑</Text>
+                        <Text className={"mt-[1rem] text-gray-600"}>
+                            We’ll help you set a strong, safe, and secure password.
+                        </Text>
+
+                        <SectionBreak text={"New Password"} />
+
+                        <CustomTextField
+                            onChange={(e: string): void => {
+                            }}
+                            value={""}
+                            isSecure={false}
+                            placeholder={"New Password"}
+                            keyboardType={"visible-password"}
+                            icon={
+                                <FontAwesome5 name="key" size={20} color="rgba(0, 0, 0, 0.3)"/>
+                            }
+                            wrapperFieldStyles={"mt-[0.45rem]"}
+                        />
+
+
+                        <SectionBreak text={"Comfirm Password"} />
+                        <CustomTextField
+                            onChange={(e: string): void => {
+                            }}
+                            value={""}
+                            isSecure={false}
+                            placeholder={"New Password"}
+                            keyboardType={"visible-password"}
+                            icon={
+                                <FontAwesome5 name="key" size={20} color="rgba(0, 0, 0, 0.3)"/>
+                            }
+                            wrapperFieldStyles={"mt-[0.45rem]"}
+                        />
+
+
+                        <SectionBreak text={"Password Rules"} />
+                        {
+                            ResetPasswordVariables.passwordRules.map((item: string, index: number): React.JSX.Element => {
+                                return (
+                                    <View key={index} className={"mt-[0.45rem] flex-row items-center"}>
+                                        <Entypo
+                                            style={{
+                                                transform: [
+                                                    {
+                                                        translateY: index > 0 ? -8 : 0
+                                                    }
+                                                ]
+                                            }}
+                                            name="dot-single" size={24} color="rgba(0, 0, 0, 0.5)" />
+                                        <Text className={"font-light flex-1 text-black/50"}>{item}</Text>
+                                    </View>
+                                )
+                            })
+                        }
                     </Animated.View>
                 )
             }
