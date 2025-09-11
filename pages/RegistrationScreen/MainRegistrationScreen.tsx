@@ -6,7 +6,7 @@ import {
     Keyboard,
     useWindowDimensions,
     ActivityIndicator,
-    Dimensions
+    Dimensions, TextInput
 } from "react-native";
 import Animated, {
     Easing,
@@ -45,6 +45,7 @@ export default function MainRegistrationScreen(): React.JSX.Element {
             ]
         }
     });
+
 
 
     // MARK: SignIn form data schema
@@ -244,7 +245,7 @@ export default function MainRegistrationScreen(): React.JSX.Element {
                     <Text className={"text-[1rem]"}>
                         Don't have an account
                     </Text>
-                    <Pressable onPress={signIn}>
+                    <Pressable onPress={() => navigation.navigate(SCREENS.SignUpScreen)}>
                         <Text className={"font-bold underline p-[0.5rem] text-[1rem]"}>
                             Sign Up
                         </Text>

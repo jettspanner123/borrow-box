@@ -21,6 +21,7 @@ import Animated, {
     SlideOutRight,
     SlideInRight, SlideInLeft, LinearTransition
 } from "react-native-reanimated";
+import * as querystring from "node:querystring";
 
 
 export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
@@ -32,11 +33,17 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
         PhoneNumberVerificationScreen
     }
 
-    const [currentScreen, setCurrentScreen] = React.useState<PhoneVerificationScreens>(PhoneVerificationScreens.PhoneNumberVerificationScreen);
+    const otpFieldRefOne: React.RefObject<TextInput | null> = React.useRef(null);
+    const otpFieldRefTwo: React.RefObject<TextInput | null> = React.useRef(null);
+    const otpFieldRefThree: React.RefObject<TextInput | null> = React.useRef(null);
+    const otpFieldRefFour: React.RefObject<TextInput | null> = React.useRef(null);
 
+
+    const [currentScreen, setCurrentScreen] = React.useState<PhoneVerificationScreens>(PhoneVerificationScreens.PhoneNumberFormScreen);
     const [phoneNumber, setPhoneNumber] = React.useState<string>("");
-    const [OTP, setOTP] = React.useState<string>("");
+    const [OTP, setOTP] = React.useState<Array<string>>(["", "", "", ""]);
     const [isOTPLoading, setOTPLoading] = React.useState<boolean>(false);
+    const [showOTPError, setOTPError] = React.useState<boolean>(false);
 
     const bottomPaddingForKeyboard: SharedValue<number> = useSharedValue(64);
 
@@ -60,6 +67,19 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
         }
     });
 
+    React.useEffect(() => {
+        if (OTP.length == 1) {
+            otpFieldRefTwo.current?.focus();
+            console.log(OTP.length);
+        } else if (OTP.length == 2) {
+            otpFieldRefThree.current?.focus();
+            console.log(OTP.length);
+        } else if (OTP.length == 3) {
+            otpFieldRefFour.current?.focus();
+            console.log(OTP.length);
+        }
+    }, [OTP]);
+
 
     async function getOTP(): Promise<void> {
         setOTPLoading(true);
@@ -71,6 +91,18 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
     }
 
+    const handleChange = (text: string, index: number) => {
+        // Update the digit in the right spot
+        const newOTP = [...OTP];
+        newOTP[index] = text;
+        setOTP(newOTP);
+
+        // Auto move to next field
+        if (text && index === 0) otpFieldRefTwo.current?.focus();
+        if (text && index === 1) otpFieldRefThree.current?.focus();
+        if (text && index === 2) otpFieldRefFour.current?.focus();
+    };
+
     return (
         <Animated.View
             layout={LinearTransition}
@@ -81,9 +113,6 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
             {
                 currentScreen === PhoneVerificationScreens.PhoneNumberFormScreen ? (
                     <Animated.View
-                        layout={LinearTransition}
-                        entering={SlideInLeft}
-                        exiting={SlideOutLeft}
                         className={'w-full px-[1.5rem] pt-[13vh]'}>
 
                         <Text className={"font-semibold text-[2.6rem]"}>Enter you phone number ☎️</Text>
@@ -99,7 +128,7 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
                                 <FontAwesome5 name="phone-alt" size={20} color="rgba(0, 0, 0, 0.25)"/>
                             }
                             autoFocus={true}
-                            autoFocusDelay={500}
+                            autoFocusDelay={600}
                             keyboardType={"numeric"}
                         />
 
@@ -121,9 +150,6 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
                     </Animated.View>
                 ) : (
                     <Animated.View
-                        layout={LinearTransition}
-                        entering={SlideInRight}
-                        exiting={SlideOutRight}
                         className={"w-full px-[1.5rem] pt-[13vh]"}>
                         <Text className={"font-semibold text-[2.6rem]"}>Confirm Your Mobile Number ☎️</Text>
                         <Text className={"mt-[1rem] text-gray-600"}>Enter the code sent to you mobile number
@@ -131,37 +157,30 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
                         </Text>
 
                         <View className={"w-full flex-row mt-[1.5rem] gap-[0.5rem]"}>
-                            <TextInput
-                                autoFocus
-                                value={OTP.split("")[0]}
-                                maxLength={1}
-                                className={"border-black/30 border-[1px] text-center flex-1 p-[1rem] rounded-xl text-[2rem]"}
-                                keyboardType={"number-pad"}
-                            />
 
-                            <TextInput
-                                autoFocus
-                                value={OTP.split("")[0]}
-                                maxLength={1}
-                                className={"border-black/30 border-[1px] text-center flex-1 p-[1rem] rounded-xl text-[2rem]"}
-                                keyboardType={"number-pad"}
-                            />
+                            {
+                                [0, 1, 2, 3].map((item: number, index: number): React.JSX.Element => {
+                                    function getRef() {
+                                        if (index == 0) return otpFieldRefOne;
+                                        else if (index == 1) return otpFieldRefTwo;
+                                        else if (index == 2) return otpFieldRefThree;
+                                        else return otpFieldRefFour;
+                                    }
 
-                            <TextInput
-                                autoFocus
-                                value={OTP.split("")[0]}
-                                maxLength={1}
-                                className={"border-black/30 border-[1px] text-center flex-1 p-[1rem] rounded-xl text-[2rem]"}
-                                keyboardType={"number-pad"}
-                            />
+                                    return (
+                                        <TextInput
+                                            ref={getRef()}
+                                            autoFocus={index === 0}
+                                            value={OTP[index]}
+                                            maxLength={1}
+                                            className={"border-black/30 border-[1px] text-center flex-1 p-[1rem] rounded-xl text-[2rem]"}
+                                            keyboardType={"number-pad"}
+                                            onChangeText={(e) => handleChange(e, index)}
+                                        />
+                                    )
+                                })
+                            }
 
-                            <TextInput
-                                autoFocus
-                                value={OTP.split("")[0]}
-                                maxLength={1}
-                                className={"border-black/30 border-[1px] text-center flex-1 p-[1rem] rounded-xl text-[2rem]"}
-                                keyboardType={"number-pad"}
-                            />
                         </View>
 
 
@@ -188,7 +207,6 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
                                 </Text>
                             </Pressable>
                         </View>
-
 
                         {/*MARK: Submit button*/}
                         <Animated.View

@@ -1,6 +1,7 @@
 import React from "react";
 import {KeyboardTypeOptions, Platform, Pressable, TextInput, View} from "react-native";
 import Feather from '@expo/vector-icons/Feather';
+import * as Haptics from "expo-haptics";
 
 interface CustomTextFieldProps {
     onChange: (text: string) => void;
@@ -15,8 +16,20 @@ interface CustomTextFieldProps {
     keyboardType: KeyboardTypeOptions;
 }
 
+
 export default function CustomTextField(
-    {onChange, value, inputFieldStyles, wrapperFieldStyles, isSecure, placeholder, icon, autoFocus, autoFocusDelay, keyboardType}
+    {
+        onChange,
+        value,
+        inputFieldStyles,
+        wrapperFieldStyles,
+        isSecure,
+        placeholder,
+        icon,
+        autoFocus,
+        autoFocusDelay,
+        keyboardType
+    }
     : CustomTextFieldProps): React.JSX.Element {
 
     const [showPassword, setShowPassword] = React.useState<boolean>(false);
@@ -35,7 +48,7 @@ export default function CustomTextField(
                 paddingInline: 16,
                 paddingBlock: Platform.OS === "ios" ? 14 : 8
             }}
-            className={`w-full flex-row items-center border-[0.5px] border-black/30 rounded-2xl mt-[1rem] gap-[0.75rem] ${wrapperFieldStyles && wrapperFieldStyles}`}>
+            className={`w-full bg-white flex-row items-center border-[0.5px] border-black/30 rounded-2xl mt-[1rem] gap-[0.75rem] ${wrapperFieldStyles && wrapperFieldStyles}`}>
             {
                 icon && (
                     icon
@@ -43,7 +56,7 @@ export default function CustomTextField(
             }
             <TextInput
                 ref={ref}
-                className={`w-full text-[1rem] ${inputFieldStyles && inputFieldStyles}`}
+                className={`text-[1rem] flex-1 ${inputFieldStyles && inputFieldStyles}`}
                 value={value}
                 secureTextEntry={showPassword ? false : isSecure}
                 onChangeText={(e: string): void => onChange(e)}
@@ -53,7 +66,10 @@ export default function CustomTextField(
             {
                 isSecure && (
                     <Pressable
-                        onPress={() => setShowPassword(!showPassword)}
+                        onPress={async () => {
+                            setShowPassword(!showPassword);
+                            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        }}
                         className={"absolute right-[1rem] p-[0.5rem] "}
                     >
                         <View>

@@ -8,7 +8,8 @@ import {NavigationContainer} from "@react-navigation/native";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import TestScreen from "./pages/TestScreen";
 import ForgetPasswordScreen from "./pages/RegistrationScreen/ForgetPasswordScreen";
-import ForgetPasswordOTPVerificationScreen from "./pages/RegistrationScreen/ForgetPasswordOTPVerificationScreen";
+import MainSignUpScreen from "./pages/RegistrationScreen/CreateAccountPages/MainSignUpScreen";
+import BasicInformationScreen from "./pages/RegistrationScreen/CreateAccountPages/BasicInformationScreen";
 
 
 function HomeScreen( ): React.JSX.Element {
@@ -23,6 +24,7 @@ function HomeScreen( ): React.JSX.Element {
             {/*}*/}
 
             <MainRegistrationScreen/>
+            {/*<MainSignUpScreen />*/}
         </View>
     )
 }
@@ -31,6 +33,8 @@ export const SCREENS = {
     HomeScreen: "HomeScreen",
     TestScreen: "TestScreen",
     ForgotPasswordScreen: "ForgotPasswordScreen",
+    SignUpScreen: "SignUpScreen",
+    BasicInformationScreen: "BasicInformationScreen",
 }
 
 
@@ -43,6 +47,8 @@ export default function App(): React.JSX.Element {
                 <NavigationStack.Screen name={SCREENS.HomeScreen} component={HomeScreen}/>
                 <NavigationStack.Screen name={SCREENS.TestScreen} component={TestScreen}/>
                 <NavigationStack.Screen name={SCREENS.ForgotPasswordScreen} component={ForgetPasswordScreen}/>
+                <NavigationStack.Screen name={SCREENS.SignUpScreen} component={MainSignUpScreen}/>
+                <NavigationStack.Screen name={SCREENS.BasicInformationScreen} component={BasicInformationScreen}/>
             </NavigationStack.Navigator>
         </NavigationContainer>
     );
