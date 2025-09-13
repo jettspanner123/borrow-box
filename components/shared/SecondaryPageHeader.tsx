@@ -2,7 +2,7 @@ import React from "react";
 import {useNavigation} from "@react-navigation/native";
 import {Pressable, StyleSheet, Text, View} from "react-native";
 import {LinearGradient} from "expo-linear-gradient";
-import {AntDesign} from "@expo/vector-icons";
+import {AntDesign, Entypo} from "@expo/vector-icons";
 
 export default function SecondaryPageHeaderWithBackButton({name}: {
     name: string,
@@ -32,7 +32,13 @@ export default function SecondaryPageHeaderWithBackButton({name}: {
             >
                 <View
                     className={"h-[3rem] border-[1px] border-black/10 aspect-square bg-white rounded-full justify-center items-center"}>
-                    <AntDesign name="arrowleft" size={24} color="rgba(0, 0, 0, 0.75)"/>
+                    <Entypo
+                        style={{
+                            transform: [
+                                { translateX: -1}
+                            ]
+                        }}
+                        name="chevron-left" size={20} color="rgba(0, 0, 0, 0.75)" />
                 </View>
                 <Text className={"font-semibold text-[1.2rem]"}>
                     {name}
@@ -40,7 +46,7 @@ export default function SecondaryPageHeaderWithBackButton({name}: {
 
                 <View
                     className={"h-[3.5rem] mb-[1rem] invisible aspect-square bg-white justify-center items-center"}>
-                    <AntDesign name="arrowleft" size={24} color="rgba(0, 0, 0, 0.75)"/>
+                    {/*<AntDesign name="arrowleft" size={24} color="rgba(0, 0, 0, 0.75)"/>*/}
                 </View>
             </Pressable>
         </View>

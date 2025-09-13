@@ -185,22 +185,13 @@ function CustomRenderItem({item, index, scroll}: {
 
     return (
         <View
-            className={"justify-start items-center h-screen w-screen pt-[5rem]"}>
+            style={{
+                height: SCREEN_HEIGHT,
+                width: SCREEN_WIDTH,
+                backgroundColor: index == 0 || index == 2 ? "white" : "black"
+            }}
+            className={"justify-start items-center pt-[5rem]"}>
 
-            {/*MARK: Overlay holder*/}
-            <View style={{
-                ...StyleSheet.absoluteFillObject,
-                justifyContent: "flex-end",
-                alignItems: "center"
-            }}>
-
-                {/*MARK: Overlay circle*/}
-                <Animated.View
-                    style={[circleAnimation, {
-                        backgroundColor: item.backgroundColor
-                    }]}
-                    className={"w-screen h-[100vw] rounded-full"}/>
-            </View>
 
 
             {/*MARK: Animation holder*/}
@@ -268,7 +259,7 @@ function CustomRenderItem({item, index, scroll}: {
                                 className={"bg-white h-[6rem] aspect-square rounded-full justify-center items-center"}
                                 style={[animateNextButtonClickedScale]}>
                                 <Animated.View style={animateNextButtonArrowTranslation}>
-                                    <AntDesign name="arrowright" size={24} color="black"/>
+                                    <AntDesign name="arrow-right" size={24} color="black"/>
                                 </Animated.View>
                             </Animated.View>
                         </Pressable>

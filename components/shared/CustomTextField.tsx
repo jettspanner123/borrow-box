@@ -14,6 +14,8 @@ interface CustomTextFieldProps {
     autoFocus?: boolean;
     autoFocusDelay?: number;
     keyboardType: KeyboardTypeOptions;
+    onFocus?: () => void;
+    onBlur?: () => void;
 }
 
 
@@ -28,7 +30,9 @@ export default function CustomTextField(
         icon,
         autoFocus,
         autoFocusDelay,
-        keyboardType
+        keyboardType,
+        onFocus,
+        onBlur
     }
     : CustomTextFieldProps): React.JSX.Element {
 
@@ -62,6 +66,8 @@ export default function CustomTextField(
                 onChangeText={(e: string): void => onChange(e)}
                 placeholder={placeholder}
                 keyboardType={keyboardType}
+                onFocus={onFocus}
+                onBlur={onBlur}
             />
             {
                 isSecure && (

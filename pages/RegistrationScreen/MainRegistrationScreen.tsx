@@ -130,10 +130,11 @@ export default function MainRegistrationScreen(): React.JSX.Element {
     }, []);
 
 
+    // @ts-ignore
     return (
         <Animated.View
             entering={CustomBackgroundColorAnimation}
-            className={"w-screen h-screen items-center justify-start"}>
+            className={"flex-1 items-center justify-start"}>
 
 
             {/*MARK: This is the page change transition blob*/}

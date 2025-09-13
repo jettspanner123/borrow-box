@@ -5,7 +5,7 @@ import {
     Pressable,
     ActivityIndicator,
     Keyboard,
-    TextInput,
+    TextInput, ScrollView,
 } from "react-native";
 import SecondaryPageHeaderWithBackButton from "../../components/shared/SecondaryPageHeader";
 import CustomTextField from "../../components/shared/CustomTextField";
@@ -17,7 +17,7 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withTiming,
-    LinearTransition
+    LinearTransition, FadeInLeft, FadeOutLeft, FadeInRight, FadeOutRight, Easing,
 } from "react-native-reanimated";
 import SectionBreak from "../../components/shared/Sectionbreak";
 import {Entypo} from "@expo/vector-icons";
@@ -44,12 +44,20 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
     const [OTP, setOTP] = React.useState<Array<string>>(["", "", "", ""]);
     const [isOTPLoading, setOTPLoading] = React.useState<boolean>(false);
     const [showOTPError, setOTPError] = React.useState<boolean>(false);
+    const [showResetPasswordButton, setShowResetPasswordButton] = React.useState<boolean>(false);
 
     const bottomPaddingForKeyboard: SharedValue<number> = useSharedValue(64);
+    const wholeScreenTranslation: SharedValue<number> = useSharedValue(0);
 
     const bottomPaddingForKeyboardAnimation = useAnimatedStyle(() => {
         return {
             paddingBottom: bottomPaddingForKeyboard.value
+        }
+    });
+
+    const wholeScreenTranslationAnimation = useAnimatedStyle(() => {
+        return {
+            transform: [{translateY: wholeScreenTranslation.value}]
         }
     });
 
@@ -113,204 +121,254 @@ export default function ForgetPasswordScreen({}: {}): React.JSX.Element {
         if (text && index === 2) otpFieldRefFour.current?.focus();
     };
 
-    interface ResetPasswordVariables {
-        passwordRules: Array<string>
-    }
 
-    const ResetPasswordVariables: ResetPasswordVariables = {
-        passwordRules: [
-            "The Password Should Be 8 Characters Long.",
-            "Password Should Have At Least 1 Special Character. [@, #, !, $, %, ^, &, *]",
-            "The Password Should Not Contain Any Slur Words!"
-        ]
-    }
+    const passwordRules: Array<string> = [
+        "The Password Should Be 8 Characters Long.",
+        "Password Should Have At Least 1 Special Character. [@, #, !, $, %, ^, &, *]",
+        "The Password Should Not Contain Any Slur Words!"];
+
 
     return (
         <Animated.View
+            style={wholeScreenTranslationAnimation}
             layout={LinearTransition}
             className={"h-screen relative w-screen justify-start items-center bg-gray-100"}>
             <SecondaryPageHeaderWithBackButton
                 name={""}
             />
-            {
-                currentScreen === PhoneVerificationScreens.PhoneNumberFormScreen ? (
-                    <Animated.View
-                        className={'w-full px-[1.5rem] pt-[13vh]'}>
 
-                        <Text className={"font-semibold text-[2.6rem]"}>Enter you phone number ☎️</Text>
-                        <Text className={"mt-[1rem] text-gray-600"}>We will send you and OTP verification to you.</Text>
+           <ScrollView
+               keyboardShouldPersistTaps={"never"}
+           >
+               {
+                   currentScreen === PhoneVerificationScreens.PhoneNumberFormScreen && (
+                       <Animated.View
+                           entering={FadeInLeft}
+                           exiting={FadeOutLeft}
+                           layout={LinearTransition}
+                           className={'w-full px-[1.5rem] pt-[13vh]'}>
 
-                        <CustomTextField
-                            onChange={(e: string) => setPhoneNumber(e)}
-                            value={phoneNumber}
-                            isSecure={false}
-                            placeholder={"Phone Number"}
-                            wrapperFieldStyles={"mt-[2rem]"}
-                            icon={
-                                <FontAwesome5 name="phone-alt" size={20} color="rgba(0, 0, 0, 0.25)"/>
-                            }
-                            autoFocus={true}
-                            autoFocusDelay={600}
-                            keyboardType={"numeric"}
-                        />
+                           <Text className={"font-semibold text-[2.6rem]"}>Enter you phone number ☎️</Text>
+                           <Text className={"mt-[1rem] text-gray-600"}>We will send you and OTP verification to you.</Text>
 
-                        <Pressable onPress={getOTP}>
-                            <View
-                                className={"w-full h-[3.15rem] bg-black justify-center items-center p-[1rem] rounded-xl mt-[1.5rem]"}>
+                           <CustomTextField
+                               onChange={(e: string) => setPhoneNumber(e)}
+                               value={phoneNumber}
+                               isSecure={false}
+                               placeholder={"Phone Number"}
+                               wrapperFieldStyles={"mt-[2rem]"}
+                               icon={
+                                   <FontAwesome5 name="phone-alt" size={20} color="rgba(0, 0, 0, 0.25)"/>
+                               }
+                               autoFocus={true}
+                               autoFocusDelay={600}
+                               keyboardType={"numeric"}
+                           />
+                           <Pressable onPress={getOTP}>
+                               <View
+                                   className={"w-full h-[3.15rem] bg-black justify-center items-center p-[1rem] rounded-xl mt-[1.5rem]"}>
 
-                                {
-                                    isOTPLoading ? (
-                                        <ActivityIndicator size={"small"} color={"white"}/>
-                                    ) : (
-                                        <Text className={"text-white text-[1rem] font-bold"}>
-                                            Get OTP
-                                        </Text>
-                                    )
-                                }
-                            </View>
-                        </Pressable>
-                    </Animated.View>
-                ) : currentScreen === PhoneVerificationScreens.PhoneNumberVerificationScreen ? (
-                    <Animated.View
-                        className={"w-full px-[1.5rem] pt-[13vh]"}>
-                        <Text className={"font-semibold text-[2.6rem]"}>Confirm Your Mobile Number ☎️</Text>
-                        <Text className={"mt-[1rem] text-gray-600"}>Enter the code sent to you mobile number
-                            +91 {phoneNumber}
-                        </Text>
+                                   {
+                                       isOTPLoading ? (
+                                           <ActivityIndicator size={"small"} color={"white"}/>
+                                       ) : (
+                                           <Text className={"text-white text-[1rem] font-bold"}>
+                                               Get OTP
+                                           </Text>
+                                       )
+                                   }
+                               </View>
+                           </Pressable>
+                       </Animated.View>
+                   )
+               }
+               {
+                   currentScreen === PhoneVerificationScreens.PhoneNumberVerificationScreen && (
+                       <Animated.View
+                           entering={FadeInRight}
+                           exiting={currentScreen === PhoneVerificationScreens.PhoneNumberVerificationScreen ? FadeOutLeft : FadeOutRight}
+                           className={"w-full px-[1.5rem] pt-[13vh]"}>
+                           <Text className={"font-semibold text-[2.6rem]"}>Confirm Your Mobile Number ☎️</Text>
+                           <Text className={"mt-[1rem] text-gray-600"}>Enter the code sent to you mobile number
+                               +91 {phoneNumber}
+                           </Text>
 
-                        <View className={"w-full flex-row mt-[1.5rem] gap-[0.5rem]"}>
+                           <View className={"w-full flex-row mt-[1.5rem] gap-[0.5rem]"}>
 
-                            {
-                                [0, 1, 2, 3].map((item: number, index: number): React.JSX.Element => {
-                                    function getRef() {
-                                        if (index == 0) return otpFieldRefOne;
-                                        else if (index == 1) return otpFieldRefTwo;
-                                        else if (index == 2) return otpFieldRefThree;
-                                        else return otpFieldRefFour;
-                                    }
+                               {
+                                   [0, 1, 2, 3].map((item: number, index: number): React.JSX.Element => {
+                                       function getRef() {
+                                           if (index == 0) return otpFieldRefOne;
+                                           else if (index == 1) return otpFieldRefTwo;
+                                           else if (index == 2) return otpFieldRefThree;
+                                           else return otpFieldRefFour;
+                                       }
 
-                                    return (
-                                        <TextInput
-                                            key={index}
-                                            ref={getRef()}
-                                            autoFocus={index === 0}
-                                            value={OTP[index]}
-                                            maxLength={1}
-                                            className={"border-black/30 border-[1px] text-center flex-1 p-[1rem] rounded-xl text-[2rem]"}
-                                            keyboardType={"number-pad"}
-                                            onChangeText={(e) => handleChange(e, index)}
-                                        />
-                                    )
-                                })
-                            }
+                                       return (
+                                           <TextInput
+                                               key={index}
+                                               ref={getRef()}
+                                               autoFocus={index === 0}
+                                               value={OTP[index]}
+                                               maxLength={1}
+                                               className={"border-black/30 border-[1px] text-center flex-1 p-[1rem] rounded-xl text-[2rem]"}
+                                               keyboardType={"number-pad"}
+                                               onChangeText={(e) => handleChange(e, index)}
+                                           />
+                                       )
+                                   })
+                               }
 
-                        </View>
-
-
-                        {/*MARK: Option buttons*/}
-
-                        <View className={"w-full gap-[0.5rem] mt-[1rem] flex-row justify-between items-center"}>
-                            <Pressable
-                                onPress={() => {
-                                    setCurrentScreen(PhoneVerificationScreens.PhoneNumberFormScreen)
-                                }}
-                                className={"flex-1 bg-gray-200 border-[0.5px] border-black/10 p-[1rem] rounded-xl"}>
-                                <Text className={"text-[1.1rem] text-center"}>
-                                    Change Number
-                                </Text>
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => {
-                                    Keyboard.dismiss();
-                                }}
-                                className={"flex-1 bg-gray-200 border-[0.5px] border-black/10 p-[1rem] rounded-xl"}>
-                                <Text className={"text-[1.1rem] text-center"}>
-                                    Resend OTP
-                                </Text>
-                            </Pressable>
-                        </View>
-
-                        {/*MARK: Submit button*/}
-                        <Animated.View
-                            style={bottomPaddingForKeyboardAnimation}
-                            pointerEvents={"box-none"}
-                            className={"absolute  h-screen w-screen justify-end items-center px-[1.5rem]"}>
-                            <Pressable
-                                onPress={checkOTP}
-                                className={"w-full justify-center items-center bg-black rounded-xl h-[3.5rem]"}>
-                                {
-                                    isOTPLoading ? (
-                                        <ActivityIndicator size={"small"} color={"white"}/>
-                                    ) : (
-                                        <Text className={"text-white font-bold"}>Confirm</Text>
-                                    )
-                                }
-                            </Pressable>
-
-                        </Animated.View>
-                    </Animated.View>
-                ) : (
-                    <Animated.View
-                        className={"w-full px-[1.5rem] pt-[13vh]"}>
-                        <Text className={"font-semibold text-[2.6rem]"}>Set Up Your New Password 🔑</Text>
-                        <Text className={"mt-[1rem] text-gray-600"}>
-                            We’ll help you set a strong, safe, and secure password.
-                        </Text>
-
-                        <SectionBreak text={"New Password"} />
-
-                        <CustomTextField
-                            onChange={(e: string): void => {
-                            }}
-                            value={""}
-                            isSecure={false}
-                            placeholder={"New Password"}
-                            keyboardType={"visible-password"}
-                            icon={
-                                <FontAwesome5 name="key" size={20} color="rgba(0, 0, 0, 0.3)"/>
-                            }
-                            wrapperFieldStyles={"mt-[0.45rem]"}
-                        />
+                           </View>
 
 
-                        <SectionBreak text={"Comfirm Password"} />
-                        <CustomTextField
-                            onChange={(e: string): void => {
-                            }}
-                            value={""}
-                            isSecure={false}
-                            placeholder={"New Password"}
-                            keyboardType={"visible-password"}
-                            icon={
-                                <FontAwesome5 name="key" size={20} color="rgba(0, 0, 0, 0.3)"/>
-                            }
-                            wrapperFieldStyles={"mt-[0.45rem]"}
-                        />
+                           {/*MARK: Option buttons*/}
+
+                           <View className={"w-full gap-[0.5rem] mt-[1rem] flex-row justify-between items-center"}>
+                               <Pressable
+                                   onPress={() => {
+                                       setCurrentScreen(PhoneVerificationScreens.PhoneNumberFormScreen)
+                                   }}
+                                   className={"flex-1 bg-gray-200 border-[0.5px] border-black/10 p-[1rem] rounded-xl"}>
+                                   <Text className={"text-[1.1rem] text-center"}>
+                                       Change Number
+                                   </Text>
+                               </Pressable>
+
+                               <Pressable
+                                   onPress={() => {
+                                       Keyboard.dismiss();
+                                   }}
+                                   className={"flex-1 bg-gray-200 border-[0.5px] border-black/10 p-[1rem] rounded-xl"}>
+                                   <Text className={"text-[1.1rem] text-center"}>
+                                       Resend OTP
+                                   </Text>
+                               </Pressable>
+                           </View>
+
+                           {/*MARK: Submit button*/}
+                           <Animated.View
+                               style={bottomPaddingForKeyboardAnimation}
+                               pointerEvents={"box-none"}
+                               className={"absolute  h-screen w-screen justify-end items-center px-[1.5rem]"}>
+                               <Pressable
+                                   onPress={checkOTP}
+                                   className={"w-full justify-center items-center bg-black rounded-xl h-[3.5rem]"}>
+                                   {
+                                       isOTPLoading ? (
+                                           <ActivityIndicator size={"small"} color={"white"}/>
+                                       ) : (
+                                           <Text className={"text-white font-bold"}>Confirm</Text>
+                                       )
+                                   }
+                               </Pressable>
+
+                           </Animated.View>
+                       </Animated.View>
+                   )
+
+               }
+
+               {
+                   currentScreen === PhoneVerificationScreens.ResetPasswordScreen && (
+                       <Animated.View
+                           entering={FadeInRight}
+                           className={"w-full px-[1.5rem] pt-[13vh]"}>
+                           <Text className={"font-semibold text-[2.6rem]"}>Set Up Your New Password 🔑</Text>
+                           <Text className={"mt-[1rem] text-gray-600"}>
+                               We’ll help you set a strong, safe, and secure password.
+                           </Text>
+
+                           <SectionBreak text={"New Password"}/>
+
+                           <CustomTextField
+                               onChange={(e: string): void => {
+                               }}
+                               value={""}
+                               isSecure={false}
+                               placeholder={"New Password"}
+                               keyboardType={"visible-password"}
+                               icon={
+                                   <FontAwesome5 name="key" size={20} color="rgba(0, 0, 0, 0.3)"/>
+                               }
+                               wrapperFieldStyles={"mt-[0.45rem]"}
+                               onFocus={() => {
+                                   wholeScreenTranslation.value = withTiming(-150, {
+                                       duration: 500,
+                                       easing: Easing.bezier(0.85, 0, 0.15, 1)
+                                   });
+
+                               }}
+                               onBlur={() => {
+                                   wholeScreenTranslation.value = withTiming(0, {
+                                       duration: 500,
+                                       easing: Easing.bezier(0.85, 0, 0.15, 1)
+                                   });
+
+                               }}
+                           />
 
 
-                        <SectionBreak text={"Password Rules"} />
-                        {
-                            ResetPasswordVariables.passwordRules.map((item: string, index: number): React.JSX.Element => {
-                                return (
-                                    <View key={index} className={"mt-[0.45rem] flex-row items-center"}>
-                                        <Entypo
-                                            style={{
-                                                transform: [
-                                                    {
-                                                        translateY: index > 0 ? -8 : 0
-                                                    }
-                                                ]
-                                            }}
-                                            name="dot-single" size={24} color="rgba(0, 0, 0, 0.5)" />
-                                        <Text className={"font-light flex-1 text-black/50"}>{item}</Text>
-                                    </View>
-                                )
-                            })
-                        }
-                    </Animated.View>
-                )
-            }
+                           <SectionBreak text={"Comfirm Password"}/>
+                           <CustomTextField
+                               onChange={(e: string): void => {
+                               }}
+                               value={""}
+                               isSecure={true}
+                               placeholder={"New Password"}
+                               keyboardType={"visible-password"}
+                               icon={
+                                   <FontAwesome5 name="key" size={20} color="rgba(0, 0, 0, 0.3)"/>
+                               }
+                               wrapperFieldStyles={"mt-[0.45rem]"}
+                               onFocus={() => {
+                                   wholeScreenTranslation.value = withTiming(-150, {
+                                       duration: 500,
+                                       easing: Easing.bezier(0.85, 0, 0.15, 1)
+                                   });
+
+                               }}
+                               onBlur={() => {
+                                   wholeScreenTranslation.value = withTiming(0, {
+                                       duration: 500,
+                                       easing: Easing.bezier(0.85, 0, 0.15, 1)
+                                   });
+
+                               }}
+                           />
+
+
+                           <Pressable>
+                               <View
+                                   className={"p-[1rem] bg-black rounded-xl justify-center items-center h-[3.5rem] mt-[1.5rem]"}>
+                                   <Text className={"font-bold text-white"}>Reset Password</Text>
+                               </View>
+                           </Pressable>
+
+
+                           <SectionBreak text={"Password Rules"}/>
+                           {
+                               passwordRules.map((item: string, index: number): React.JSX.Element => {
+                                   return (
+                                       <View key={index} className={"mt-[0.45rem] flex-row items-center"}>
+                                           <Entypo
+                                               style={{
+                                                   transform: [
+                                                       {
+                                                           translateY: index > 0 ? -8 : 0
+                                                       }
+                                                   ]
+                                               }}
+                                               name="dot-single" size={24} color="rgba(0, 0, 0, 0.5)"/>
+                                           <Text className={"font-light flex-1 text-black/50"}>{item}</Text>
+                                       </View>
+                                   )
+                               })
+                           }
+                       </Animated.View>
+                   )
+               }
+           </ScrollView>
         </Animated.View>
     )
 }

@@ -16,17 +16,16 @@ import {
     CustomTextFieldWrapperStyles,
 } from "../../../components/shared/CustomTextField";
 import SectionBreak from "../../../components/shared/Sectionbreak";
-import {Entypo} from "@expo/vector-icons";
+import {Entypo, FontAwesome} from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 import * as Haptics from "expo-haptics";
 import Animated, {
-    Easing,
-    EntryExitAnimationFunction,
-    FadeInLeft,
-    FadeOutRight,
-    LinearTransition, SharedValue,
-    SlideInLeft,
-    SlideInRight, useAnimatedStyle, useSharedValue, withTiming
+    Easing, EntryExitAnimationFunction, FadeInDown, FadeOutDown,
+    LinearTransition,
+    SharedValue, SlideInDown, SlideInUp,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming
 } from "react-native-reanimated";
 import CustomSlideInAnimation from "../../../constants/Animations/CustomSlideInAnimation";
 import CustomSlideOutAnimation from "../../../constants/Animations/CustomSlideOutAnimation";
@@ -34,8 +33,10 @@ import CustomSlideOutAnimation from "../../../constants/Animations/CustomSlideOu
 export default function BasicInformationScreen(): React.JSX.Element {
     const [dummyData, setDummyData] = React.useState<string>("");
 
-    const [showAgePicker, setShowAgePicker] = React.useState<boolean>(true);
+    const [showAgePicker, setShowAgePicker] = React.useState<boolean>(false);
     const [sliderAge, setSliderAge] = React.useState<number>(21);
+    const [showGenderPicker, setShowGenderPicker] = React.useState<boolean>(false);
+    const [showMaritalStatusPicker, setShowMaritalStatusPicker] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         (
@@ -48,6 +49,41 @@ export default function BasicInformationScreen(): React.JSX.Element {
 
     const ageButtonChevronRotation: SharedValue<string> = useSharedValue("0deg");
     const ageButtonChevronTranslation: SharedValue<number> = useSharedValue(-1);
+
+
+    const GENDER_BUTTON_EXTENDED_HEIGHT: number = 200;
+    const GENDER_BUTTON_COMPRESSED_HEIGHT: number = 50;
+    const MARITAL_BUTTON_EXTENDED_HEIGHT: number = 200;
+    const MARITAL_BUTTON_COMPRESSED_HEIGHT: number = 50;
+
+    enum GENDER_OPTIONS {
+        MALE = "Male 🗿",
+        FEMALE = "Female 👧🏻",
+        IN_BETWEEN = "In Between 🏳️‍🌈"
+    }
+
+    enum MARITAL_STATUS {
+        BACHELOR = "Bachelor 🗿",
+        MARRIED = "Married 🥸",
+        ASEXUAL_HOMO = "Asexual Homo 🏳️‍🌈",
+    }
+
+    const [currentSelectedGender, setCurrentSelectedGender] = React.useState<GENDER_OPTIONS>(GENDER_OPTIONS.MALE);
+    const [currentSelectedMaritalStatus, setCurrentSelectedMaritalStatus] = React.useState<MARITAL_STATUS>(MARITAL_STATUS.BACHELOR);
+
+    const genderButtonHeight: SharedValue<number> = useSharedValue(GENDER_BUTTON_COMPRESSED_HEIGHT);
+    const maritalStatusButtonHeight: SharedValue<number> = useSharedValue(50);
+
+    const genderButtonHeightAnimation = useAnimatedStyle(() => {
+        return {
+            height: genderButtonHeight.value
+        }
+    });
+    const maritalStatusButtonHeightAnimation = useAnimatedStyle(() => {
+        return {
+            height: maritalStatusButtonHeight.value
+        }
+    });
 
     const ageButtonChevronRotationAnimation = useAnimatedStyle(() => {
         return {
@@ -77,6 +113,8 @@ export default function BasicInformationScreen(): React.JSX.Element {
                 className={"bg-gray-100"}
             >
 
+
+                {/*// MARK: This is the person information thing....*/}
                 <PageContainer>
                     <ScreenHeader text={"Let's Get You Started ✨"}/>
                     <ScreenDescription text={"Join us by filling out your information and start exploring now."}/>
@@ -106,12 +144,88 @@ export default function BasicInformationScreen(): React.JSX.Element {
 
                     {/*MARK: This is for gender and age*/}
                     <View className={"w-full flex-row gap-[0.5rem]"}>
-                        <View className={`${CustomTextFieldWrapperStyles} flex-[2.5] p-[1rem]`}>
-                            <Text>Hello</Text>
-                        </View>
 
+
+                        {/*MARK: Gender*/}
                         <Pressable
-                            onPress={() => {
+                            onPress={async () => {
+                                if(showAgePicker) setShowAgePicker(false);
+                                genderButtonHeight.value = withTiming(showGenderPicker ? GENDER_BUTTON_COMPRESSED_HEIGHT : GENDER_BUTTON_EXTENDED_HEIGHT, {
+                                    duration: 500,
+                                    easing: Easing.bezier(0.85, 0, 0.15, 1)
+                                });
+                                setShowGenderPicker(!showGenderPicker);
+                                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            }}
+                            style={{flex: 1}}>
+                            <Animated.View
+                                style={genderButtonHeightAnimation}
+                                layout={LinearTransition.duration(100)}
+                                className={`${CustomTextFieldWrapperStyles} flex-[2.5] p-[1rem] h-[0] flex-col overflow-hidden`}>
+
+
+                                {/*MARK: This is the placeholder*/}
+                                <Animated.View
+                                    layout={LinearTransition.duration(100)}
+                                    className={"flex-row gap-[0.75rem] w-full items-center"}>
+                                    <FontAwesome name="female" size={20} color="rgba(0, 0, 0, 0.3)"/>
+                                    <Text>{currentSelectedGender}</Text>
+                                    <Entypo
+                                        style={{marginLeft: "auto"}}
+                                        name="dots-three-horizontal"
+                                        size={20}
+                                        color="rgba(0, 0, 0, 0.3)"/>
+                                </Animated.View>
+
+
+                                {/*MARK: GEnder picker*/}
+                                {
+                                    showGenderPicker && (
+                                        <Animated.View
+                                            entering={FadeInDown}
+                                            exiting={FadeOutDown}
+                                            layout={LinearTransition.duration(100)}
+                                            className={"w-full"}>
+                                            {
+                                                Object.values(GENDER_OPTIONS).map((gender, index: number): React.JSX.Element => {
+                                                    return (
+                                                        <Pressable
+                                                            key={index}
+                                                            onPress={async () => {
+                                                                setCurrentSelectedGender(gender);
+                                                                setShowGenderPicker(false);
+
+                                                                genderButtonHeight.value = withTiming(GENDER_BUTTON_COMPRESSED_HEIGHT, {
+                                                                    duration: 500,
+                                                                    easing: Easing.bezier(0.85, 0, 0.15, 1)
+                                                                })
+
+                                                                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                                            }}
+                                                        >
+                                                            <View
+                                                                className={`${currentSelectedGender === gender ? "bg-black" : "bg-gray-200"} py-[0.7rem] px-[0.5rem] rounded-xl border-black/30 border-[0.5px] mt-[0.5rem]`}>
+                                                                <Text
+                                                                    className={`${currentSelectedGender === gender ? "text-white" : "text-black"}`}>
+                                                                    {gender}
+                                                                </Text>
+                                                            </View>
+                                                        </Pressable>
+                                                    )
+                                                })
+                                            }
+                                        </Animated.View>
+                                    )
+                                }
+                            </Animated.View>
+                        </Pressable>
+
+
+                        {/*MARK: Age*/}
+                        <Pressable
+                            onPress={async () => {
+
+                                if (showAgePicker) setShowAgePicker(false);
                                 setShowAgePicker(!showAgePicker)
                                 ageButtonChevronRotation.value = withTiming(showAgePicker ? "180deg" : "0deg", {
                                     duration: 500,
@@ -119,10 +233,13 @@ export default function BasicInformationScreen(): React.JSX.Element {
                                 ageButtonChevronTranslation.value = withTiming(showAgePicker ? 3 : 0, {
                                     duration: 500
                                 });
+
+                                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                             }
                             }>
-                            <View
-                                className={`${CustomTextFieldWrapperStyles} flex-1 p-[1rem] flex-row justify-between items-center`}>
+                            <Animated.View
+                                layout={LinearTransition}
+                                className={`${CustomTextFieldWrapperStyles} max-h-[3.5rem] flex-1 p-[1rem] flex-row justify-between items-center`}>
                                 <Text className={""}>{sliderAge} y/o</Text>
                                 <Animated.View
                                     style={ageButtonChevronTranslationAnimation}
@@ -131,14 +248,13 @@ export default function BasicInformationScreen(): React.JSX.Element {
                                         style={ageButtonChevronRotationAnimation}
                                     >
                                         <Entypo
-                                            style={ageButtonChevronRotationAnimation}
                                             name="chevron-small-down"
                                             size={24} color="black"
                                         />
                                     </Animated.View>
                                 </Animated.View>
 
-                            </View>
+                            </Animated.View>
                         </Pressable>
                     </View>
 
@@ -189,8 +305,108 @@ export default function BasicInformationScreen(): React.JSX.Element {
                             </Animated.View>
                         )
                     }
+
+
+
+
+
+                    {/*MARK: Other informations*/}
+                    <SectionBreak text={"Other Information"} additionalStyles={"mt-[3rem]"} transitionDuration={showGenderPicker ? 100 : 300}/>
+                    <Animated.View
+                        layout={LinearTransition.duration(showGenderPicker ? 100 : 300)}
+                    >
+                        <Pressable
+                            className={"mt-[-0.5rem]"}
+                            onPress={async () => {
+                                maritalStatusButtonHeight.value = withTiming(showMaritalStatusPicker ? MARITAL_BUTTON_COMPRESSED_HEIGHT : MARITAL_BUTTON_EXTENDED_HEIGHT, {
+                                    duration: 500,
+                                    easing: Easing.bezier(0.85, 0, 0.15, 1)
+                                });
+                                setShowMaritalStatusPicker(!showMaritalStatusPicker);
+                                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            }}>
+                            <Animated.View
+                                style={maritalStatusButtonHeightAnimation}
+                                layout={LinearTransition.duration(100)}
+                                className={`${CustomTextFieldWrapperStyles} flex-[2.5] p-[1rem] h-[0] flex-col overflow-hidden`}>
+
+
+                                {/*MARK: This is the placeholder*/}
+                                <Animated.View
+                                    layout={LinearTransition.duration(100)}
+                                    className={"flex-row gap-[0.75rem] w-full items-center"}>
+                                    <FontAwesome name="female" size={20} color="rgba(0, 0, 0, 0.3)"/>
+                                    <Text>{currentSelectedMaritalStatus}</Text>
+                                    <Entypo
+                                        style={{marginLeft: "auto"}}
+                                        name="dots-three-horizontal"
+                                        size={20}
+                                        color="rgba(0, 0, 0, 0.3)"/>
+                                </Animated.View>
+
+
+                                {/*MARK: GEnder picker*/}
+                                {
+                                    showMaritalStatusPicker && (
+                                        <Animated.View
+                                            entering={FadeInDown}
+                                            exiting={FadeOutDown}
+                                            layout={LinearTransition.duration(100)}
+                                            className={"w-full"}>
+                                            {
+                                                Object.values(MARITAL_STATUS).map((status, index: number): React.JSX.Element => {
+                                                    return (
+                                                        <Pressable
+                                                            key={index}
+                                                            onPress={async () => {
+                                                                setCurrentSelectedMaritalStatus(status);
+                                                                setShowMaritalStatusPicker(false);
+
+                                                                maritalStatusButtonHeight.value = withTiming(MARITAL_BUTTON_COMPRESSED_HEIGHT, {
+                                                                    duration: 500,
+                                                                    easing: Easing.bezier(0.85, 0, 0.15, 1)
+                                                                })
+
+                                                                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                                            }}
+                                                        >
+                                                            <View
+                                                                className={`${currentSelectedMaritalStatus === status ? "bg-black" : "bg-gray-200"} py-[0.7rem] px-[0.5rem] rounded-xl border-black/30 border-[0.5px] mt-[0.5rem] justify-center items-center`}>
+                                                                <Text
+                                                                    className={`${currentSelectedMaritalStatus === status ? "text-white" : "text-black"}`}>
+                                                                    {status}
+                                                                </Text>
+                                                            </View>
+                                                        </Pressable>
+                                                    )
+                                                })
+                                            }
+                                        </Animated.View>
+                                    )
+                                }
+                            </Animated.View>
+                        </Pressable>
+                    </Animated.View>
                 </PageContainer>
             </ScrollView>
         </KeyboardAvoidingView>
     );
+}
+
+
+const CustomSlideUpAnimation: EntryExitAnimationFunction = (values: any) => {
+    "worklet";
+    const animations = {
+        originY: withTiming(values.currentOriginY, {
+            duration: 500,
+        })
+    };
+    const initialValues = {
+        originY: values.currentOriginY + 50,
+    };
+
+    return {
+        initialValues,
+        animations
+    }
 }

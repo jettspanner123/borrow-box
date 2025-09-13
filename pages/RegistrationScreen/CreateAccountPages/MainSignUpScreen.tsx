@@ -98,7 +98,7 @@ export default function MainSignUpScreen(): React.JSX.Element {
     }
 
     return (
-        <View className={"h-screen w-screen bg-white"}>
+        <View className={"flex-1 bg-white"}>
             <SecondaryPageHeaderWithBackButton name={""}/>
             <View style={{flex: 1}} className={"bg-gray-100 pt-[13vh] px-[1.5rem]"}>
 
