@@ -20,7 +20,7 @@ import {Entypo, FontAwesome} from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 import * as Haptics from "expo-haptics";
 import Animated, {
-    Easing, EntryExitAnimationFunction, FadeInDown, FadeOutDown,
+    Easing, EntryExitAnimationFunction, FadeInDown, FadeInUp, FadeOutDown,
     LinearTransition,
     SharedValue, SlideInDown, SlideInUp,
     useAnimatedStyle,
@@ -29,6 +29,8 @@ import Animated, {
 } from "react-native-reanimated";
 import CustomSlideInAnimation from "../../../constants/Animations/CustomSlideInAnimation";
 import CustomSlideOutAnimation from "../../../constants/Animations/CustomSlideOutAnimation";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 export default function BasicInformationScreen(): React.JSX.Element {
     const [dummyData, setDummyData] = React.useState<string>("");
@@ -37,6 +39,7 @@ export default function BasicInformationScreen(): React.JSX.Element {
     const [sliderAge, setSliderAge] = React.useState<number>(21);
     const [showGenderPicker, setShowGenderPicker] = React.useState<boolean>(false);
     const [showMaritalStatusPicker, setShowMaritalStatusPicker] = React.useState<boolean>(false);
+    const [showDOBPicker, setShowDOBPicker] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         (
@@ -47,14 +50,13 @@ export default function BasicInformationScreen(): React.JSX.Element {
         )()
     }, [sliderAge]);
 
-    const ageButtonChevronRotation: SharedValue<string> = useSharedValue("0deg");
-    const ageButtonChevronTranslation: SharedValue<number> = useSharedValue(-1);
-
 
     const GENDER_BUTTON_EXTENDED_HEIGHT: number = 200;
     const GENDER_BUTTON_COMPRESSED_HEIGHT: number = 50;
     const MARITAL_BUTTON_EXTENDED_HEIGHT: number = 200;
     const MARITAL_BUTTON_COMPRESSED_HEIGHT: number = 50;
+    const DOB_BUTTON_COMPRESSED_HEIGHT: number = 50;
+    const DOB_BUTTON_EXTENDED_HEIGHT: number = 270;
 
     enum GENDER_OPTIONS {
         MALE = "Male 🗿",
@@ -70,9 +72,11 @@ export default function BasicInformationScreen(): React.JSX.Element {
 
     const [currentSelectedGender, setCurrentSelectedGender] = React.useState<GENDER_OPTIONS>(GENDER_OPTIONS.MALE);
     const [currentSelectedMaritalStatus, setCurrentSelectedMaritalStatus] = React.useState<MARITAL_STATUS>(MARITAL_STATUS.BACHELOR);
+    const [currentSelectedDOB, setCurrentSelectedDOB] = React.useState(new Date());
 
     const genderButtonHeight: SharedValue<number> = useSharedValue(GENDER_BUTTON_COMPRESSED_HEIGHT);
-    const maritalStatusButtonHeight: SharedValue<number> = useSharedValue(50);
+    const maritalStatusButtonHeight: SharedValue<number> = useSharedValue(MARITAL_BUTTON_COMPRESSED_HEIGHT);
+    const dobButtonHeight: SharedValue<number> = useSharedValue(DOB_BUTTON_COMPRESSED_HEIGHT);
 
     const genderButtonHeightAnimation = useAnimatedStyle(() => {
         return {
@@ -84,21 +88,12 @@ export default function BasicInformationScreen(): React.JSX.Element {
             height: maritalStatusButtonHeight.value
         }
     });
+    const dobButtonHeightAnimation = useAnimatedStyle(() => {
+        return {
+            height: dobButtonHeight.value
+        }
+    });
 
-    const ageButtonChevronRotationAnimation = useAnimatedStyle(() => {
-        return {
-            transform: [
-                {rotate: ageButtonChevronRotation.value}
-            ]
-        }
-    });
-    const ageButtonChevronTranslationAnimation = useAnimatedStyle(() => {
-        return {
-            transform: [
-                {translateY: ageButtonChevronTranslation.value},
-            ]
-        }
-    });
     return (
         <KeyboardAvoidingView
             style={{flex: 1}}
@@ -106,9 +101,14 @@ export default function BasicInformationScreen(): React.JSX.Element {
         >
 
             <SecondaryPageHeaderWithBackButton name={""}/>
+
+
+
+
+            {/*MARK: THe scroll view*/}
             <ScrollView
                 style={{flex: 1}}
-                contentContainerStyle={{flexGrow: 1}}
+                contentContainerStyle={{flexGrow: 1, paddingBottom: 200}}
                 keyboardShouldPersistTaps="never"
                 className={"bg-gray-100"}
             >
@@ -149,7 +149,7 @@ export default function BasicInformationScreen(): React.JSX.Element {
                         {/*MARK: Gender*/}
                         <Pressable
                             onPress={async () => {
-                                if(showAgePicker) setShowAgePicker(false);
+                                if (showAgePicker) setShowAgePicker(false);
                                 genderButtonHeight.value = withTiming(showGenderPicker ? GENDER_BUTTON_COMPRESSED_HEIGHT : GENDER_BUTTON_EXTENDED_HEIGHT, {
                                     duration: 500,
                                     easing: Easing.bezier(0.85, 0, 0.15, 1)
@@ -224,36 +224,20 @@ export default function BasicInformationScreen(): React.JSX.Element {
                         {/*MARK: Age*/}
                         <Pressable
                             onPress={async () => {
-
                                 if (showAgePicker) setShowAgePicker(false);
                                 setShowAgePicker(!showAgePicker)
-                                ageButtonChevronRotation.value = withTiming(showAgePicker ? "180deg" : "0deg", {
-                                    duration: 500,
-                                });
-                                ageButtonChevronTranslation.value = withTiming(showAgePicker ? 3 : 0, {
-                                    duration: 500
-                                });
-
                                 await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                             }
                             }>
                             <Animated.View
                                 layout={LinearTransition}
-                                className={`${CustomTextFieldWrapperStyles} max-h-[3.5rem] flex-1 p-[1rem] flex-row justify-between items-center`}>
+                                className={`${CustomTextFieldWrapperStyles} max-h-[3.5rem] flex-1 gap-[1rem] p-[1rem] flex-row justify-between items-center`}>
                                 <Text className={""}>{sliderAge} y/o</Text>
-                                <Animated.View
-                                    style={ageButtonChevronTranslationAnimation}
-                                >
-                                    <Animated.View
-                                        style={ageButtonChevronRotationAnimation}
-                                    >
-                                        <Entypo
-                                            name="chevron-small-down"
-                                            size={24} color="black"
-                                        />
-                                    </Animated.View>
-                                </Animated.View>
-
+                                <Entypo
+                                    style={{marginLeft: "auto"}}
+                                    name="dots-three-horizontal"
+                                    size={20}
+                                    color="rgba(0, 0, 0, 0.3)"/>
                             </Animated.View>
                         </Pressable>
                     </View>
@@ -307,11 +291,9 @@ export default function BasicInformationScreen(): React.JSX.Element {
                     }
 
 
-
-
-
                     {/*MARK: Other informations*/}
-                    <SectionBreak text={"Other Information"} additionalStyles={"mt-[3rem]"} transitionDuration={showGenderPicker ? 100 : 300}/>
+                    <SectionBreak text={"Other Information"} additionalStyles={"mt-[3rem]"}
+                                  transitionDuration={showGenderPicker ? 100 : 300}/>
                     <Animated.View
                         layout={LinearTransition.duration(showGenderPicker ? 100 : 300)}
                     >
@@ -387,26 +369,53 @@ export default function BasicInformationScreen(): React.JSX.Element {
                             </Animated.View>
                         </Pressable>
                     </Animated.View>
+
+
+                    {/*MARK: THis is the DOB Picker*/}
+                    <Pressable
+                        onPress={() => {
+                            setShowDOBPicker(!showDOBPicker);
+                            dobButtonHeight.value = withTiming(!showDOBPicker ? DOB_BUTTON_EXTENDED_HEIGHT : DOB_BUTTON_COMPRESSED_HEIGHT, {
+                                duration: 500,
+                                easing: Easing.bezier(0.85, 0, 0.15, 1)
+                            });
+                        }}>
+                        <Animated.View
+                            style={dobButtonHeightAnimation}
+                            layout={LinearTransition.duration(100)}
+                            className={`${CustomTextFieldWrapperStyles} p-[1rem] h-0 flex-col overflow-hidden`}>
+
+                            {/*MARK: THIs is the dob placeholder*/}
+                            <Animated.View
+                                layout={LinearTransition.duration(100)}
+                                className={"flex-row gap-[0.75rem] items-center w-full"}>
+                                <MaterialIcons name="date-range" size={20} color="rgba(0, 0, 0, 0.3)"/>
+                                <Text>{currentSelectedDOB.toLocaleDateString()}</Text>
+
+                                <Entypo style={{marginLeft: "auto"}} name={"dots-three-horizontal"} size={20}
+                                        color="rgba(0, 0, 0, 0.3)"/>
+                            </Animated.View>
+
+
+                            {/*MARK: THis is the actual date picker*/}
+                            {
+                                showDOBPicker && (
+                                    <Animated.View
+                                        exiting={FadeOutDown}
+                                    >
+                                        <RNDateTimePicker
+                                            value={currentSelectedDOB}
+                                            onChange={(value, date) => setCurrentSelectedDOB(date!)}
+                                            display={"spinner"}
+                                        />
+                                    </Animated.View>
+                                )
+                            }
+                        </Animated.View>
+                    </Pressable>
                 </PageContainer>
+
             </ScrollView>
         </KeyboardAvoidingView>
     );
-}
-
-
-const CustomSlideUpAnimation: EntryExitAnimationFunction = (values: any) => {
-    "worklet";
-    const animations = {
-        originY: withTiming(values.currentOriginY, {
-            duration: 500,
-        })
-    };
-    const initialValues = {
-        originY: values.currentOriginY + 50,
-    };
-
-    return {
-        initialValues,
-        animations
-    }
 }

@@ -47,7 +47,6 @@ export default function MainRegistrationScreen(): React.JSX.Element {
     });
 
 
-
     // MARK: SignIn form data schema
     const SignInFormSchema = z.object({
         emailId: z.email(),
@@ -246,7 +245,10 @@ export default function MainRegistrationScreen(): React.JSX.Element {
                     <Text className={"text-[1rem]"}>
                         Don't have an account
                     </Text>
-                    <Pressable onPress={() => navigation.navigate(SCREENS.SignUpScreen)}>
+                    <Pressable onPress={() => {
+                        // @ts-ignore
+                        navigation.navigate(SCREENS.SignUpScreen)
+                    }}>
                         <Text className={"font-bold underline p-[0.5rem] text-[1rem]"}>
                             Sign Up
                         </Text>
