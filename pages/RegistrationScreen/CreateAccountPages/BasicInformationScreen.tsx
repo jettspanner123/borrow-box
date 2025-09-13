@@ -56,7 +56,7 @@ export default function BasicInformationScreen(): React.JSX.Element {
     const MARITAL_BUTTON_EXTENDED_HEIGHT: number = 200;
     const MARITAL_BUTTON_COMPRESSED_HEIGHT: number = 50;
     const DOB_BUTTON_COMPRESSED_HEIGHT: number = 50;
-    const DOB_BUTTON_EXTENDED_HEIGHT: number = 270;
+    const DOB_BUTTON_EXTENDED_HEIGHT: number = 210;
 
     enum GENDER_OPTIONS {
         MALE = "Male 🗿",
@@ -103,12 +103,10 @@ export default function BasicInformationScreen(): React.JSX.Element {
             <SecondaryPageHeaderWithBackButton name={""}/>
 
 
-
-
             {/*MARK: THe scroll view*/}
             <ScrollView
                 style={{flex: 1}}
-                contentContainerStyle={{flexGrow: 1, paddingBottom: 200}}
+                contentContainerStyle={{flexGrow: 1}}
                 keyboardShouldPersistTaps="never"
                 className={"bg-gray-100"}
             >
@@ -373,12 +371,13 @@ export default function BasicInformationScreen(): React.JSX.Element {
 
                     {/*MARK: THis is the DOB Picker*/}
                     <Pressable
-                        onPress={() => {
+                        onPress={async () => {
                             setShowDOBPicker(!showDOBPicker);
                             dobButtonHeight.value = withTiming(!showDOBPicker ? DOB_BUTTON_EXTENDED_HEIGHT : DOB_BUTTON_COMPRESSED_HEIGHT, {
                                 duration: 500,
                                 easing: Easing.bezier(0.85, 0, 0.15, 1)
                             });
+                            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         }}>
                         <Animated.View
                             style={dobButtonHeightAnimation}

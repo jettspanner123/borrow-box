@@ -11,18 +11,22 @@ import Animated, {
 } from "react-native-reanimated";
 import {Entypo} from "@expo/vector-icons";
 import AddressInformationScreen from "./AddressInformationScreen";
+import * as Haptics from "expo-haptics";
+import ProfileInformationScreen from "./ProfileInformationScreen";
 
 export default function MainCreateAccountScreen(): React.JSX.Element {
 
-    const [currentPage, setCurrentPage] = React.useState<number>(0);
+    const [currentPage, setCurrentPage] = React.useState<number>(2);
 
 
-    function moveToNextPage(): void {
+    async function moveToNextPage() {
         setCurrentPage(currentPage + 1);
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
 
-    function moveToPreviousPage(): void {
+    async function moveToPreviousPage() {
         setCurrentPage(currentPage - 1);
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
 
     return (
@@ -64,8 +68,16 @@ export default function MainCreateAccountScreen(): React.JSX.Element {
                         className={""}>
                         <View
                             className={"h-[3.5rem] w-full bg-black rounded-xl p-[1rem] justify-center items-center flex-row gap-[0.75rem]"}>
-                            <Text className={"font-bold text-white"}>Proceed Further</Text>
-                            <Entypo name="chevron-right" size={18} color="white"/>
+                            <Text className={"font-bold text-white"}>
+                                {
+                                    currentPage < 2 ? "Proceed Further" : "Create Account"
+                                }
+                            </Text>
+                            {
+                                currentPage < 2 && (
+                                    <Entypo name="chevron-right" size={18} color="white"/>
+                                )
+                            }
                         </View>
                     </Pressable>
                 </Animated.View>
@@ -87,8 +99,20 @@ export default function MainCreateAccountScreen(): React.JSX.Element {
                     <Animated.View
                         entering={FadeInRight}
                         exiting={FadeOutRight}
+                        className={"h-screen w-screen"}
                     >
-                        <AddressInformationScreen />
+                        <AddressInformationScreen/>
+                    </Animated.View>
+                )
+            }
+            {
+                currentPage === 2 && (
+                    <Animated.View
+                        entering={FadeInRight}
+                        exiting={FadeOutRight}
+                        className={"h-screen w-screen"}
+                    >
+                        <ProfileInformationScreen/>
                     </Animated.View>
                 )
             }
